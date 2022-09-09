@@ -1,0 +1,152 @@
+---
+title: "Colors in R"
+author: "Wendy Phillips"
+date: '2022-09-09'
+output: html_document
+---
+
+# This is a work in progress!!!
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library(viridis)
+library(RColorBrewer)
+library(scales)
+library(rcartocolor)
+```
+
+
+## Working with colors in R
+
+Sometimes you want to explore what a palette of colors looks like. Here are some ways of plotting them.
+
+First make a set of colors.
+```{r}
+colors <- c ("blue", "green", "purple", "red", "orange", "pink")
+```
+
+The library **scales** has a function that does this nicely.
+```{r}
+scales::show_col(colors)
+```
+
+You can show the colors in a pie chart, as shown below.
+```{r}
+pie(rep(1,6), col=colors)
+```
+
+You could create your own function.
+```{r}
+showCols <- function(cl=colors(), bg = "white", cex = 1.5, rot = 30) {
+  m <- ceiling(sqrt(n <-length(cl)))
+  length(cl) <- m*m; cm <- matrix(cl, m)
+  require("grid")
+  grid.newpage(); vp <- viewport(w = .5, h = .5)
+  grid.rect(gp=gpar(fill=bg))
+  grid.text(cm, x = col(cm)/m, y = rev(row(cm))/m, rot = rot,
+            vp=vp, gp=gpar(cex = cex, col = cm))
+}
+```
+
+
+```{r}
+showCols(colors)
+```
+
+### Built in graphics device colors
+The R graphics device has a built in set of colors. We can explore those.
+```{r}
+# Get all non-grey colors
+non_grey_colors = grDevices::colors()[grep('gr(a|e)y', grDevices::colors(), invert = T)]
+length(non_grey_colors)
+```
+
+```{r}
+# Get all non-grey colors
+color = grDevices::colors()[grep('gr(a|e)y', grDevices::colors(), invert = T)]
+
+# Randomly sample from those colors
+cols <- sample(color, 26)
+scales::show_col(cols, cex_label = 0.5)
+```
+
+How many colors in the grDevices color palette include 'blue' in the name?
+```{r}
+# Get all non-grey colors
+blues = grDevices::colors()[grep('blue', grDevices::colors())]
+length(blues)
+scales::show_col(blues, cex_label = 0.5)
+```
+
+```{r}
+jet.colors <- colorRampPalette(c("#00007F", "blue", "#007FFF", "cyan", "#7FFF7F", "yellow", "#FF7F00", "red", "#7F0000"))
+
+scales::show_col(jet.colors(20), cex_label = 0.5)
+```
+
+
+
+The two most commonly used libraries with their own sets of color palettes are **RColorBrewer** and **viridis**.
+Make color palettes.  
+
+Some color libraries have built in functions for displaying their colors.
+
+For RColorBrewer:
+```{r}
+RColorBrewer::display.brewer.pal(9, "Greens")
+```
+
+
+```{r}
+
+heatmap_cols <- viridis(n = 256, alpha = 1, begin = 0, end = 1, 
+                        direction = 1, option = "D")
+
+```
+
+
+
+```{r}
+
+col=brewer.pal(n=12, name="Set3")
+
+rgb.palette <- colorRampPalette(c("red", "green", "blue"),
+                                space = "rgb")
+mycolors <- colorRampPalette(brewer.pal(11,"BrBG"))
+
+rain.palette <- colorRampPalette(brewer.pal(9,"Blues"))
+pie(rep(1,6), col=rain.palette(6))
+
+getPalette = colorRampPalette(brewer.pal(9, "Set1"))
+pie(rep(1,10), col=getPalette(10))
+
+```
+
+```{r}
+display.brewer.pal(8, "Set1")
+```
+
+```{r}
+brewer.pal(9, "Greens")[c(4,6,8)]
+```
+
+
+
+
+
+
+```{r}
+# From https://carto.com/carto-colors/
+safe_CARTOColors <- c("#88CCEE","#CC6677","#DDCC77","#18ad4a","#332288","#AA4499","#44AA99","#999933","#882255","#661100","#6699CC")
+
+pie(rep(1,11), col=safe_CARTOColors)
+# Colors for metadata cats
+bmi_group_cols <- c(safe_CARTOColors[[1]], safe_CARTOColors[[5]])
+ft_mass_to_ht_gp_cols <- c(safe_CARTOColors[[2]], safe_CARTOColors[[10]])
+ag_ratio_gp_cols <- c(safe_CARTOColors[[3]], safe_CARTOColors[[8]])
+
+
+```
