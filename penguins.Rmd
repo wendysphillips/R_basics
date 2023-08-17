@@ -1,0 +1,90 @@
+---
+title: "Penguins data exploration"
+author: "Wendy Phillips"
+date: "2023-08-12"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, message = FALSE)
+```
+
+```{r}
+library(tidyverse)
+library(scatterPlotMatrix)
+```
+
+
+```{r}
+pen_size <- read.csv("/Users/wendyphillips/Documents/Computing/R_work/data/penguins_size.csv")
+```
+
+```{r}
+str(pen_size)
+```
+
+
+```{r}
+summary(pen_size)
+```
+
+
+```{r}
+print(unique(pen_size$species))
+print(table(pen_size$species))
+```
+
+```{r}
+print(unique(pen_size$island))
+print(table(pen_size$island))
+```
+
+
+```{r}
+table(pen_size$sex)
+```
+
+
+```{r}
+ pen_size[grep("\\.", pen_size$sex),]
+```
+
+```{r}
+ pen_size$sex[grep("\\.", pen_size$sex)] <- "unknown"
+```
+
+Determine how many NA values there are for sex
+```{r}
+sum(is.na(pen_size$sex))
+```
+
+Change these to unknown
+```{r}
+ pen_size$sex[is.na(pen_size$sex)] <- "unknown"
+```
+
+
+```{r}
+table(pen_size$sex)
+```
+
+```{r}
+pen_size <- drop_na(pen_size)
+```
+
+```{r}
+pairs(select_if(pen_size, is.numeric))
+```
+
+
+```{r}
+pen_size$species <- factor(pen_size$species)
+columnLabels <- gsub("_", "<br>", colnames(pen_size))
+scatterPlotMatrix(pen_size, zAxisDim = "species", distribType = 1, columnLabels = columnLabels)
+```
+
+Record versions being used
+```{r}
+sessionInfo()
+```
+
