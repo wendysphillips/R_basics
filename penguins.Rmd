@@ -1,7 +1,7 @@
 ---
 title: "Penguins data exploration"
 author: "Wendy Phillips"
-date: "2023-08-12"
+date: "2023-08-18"
 output: html_document
 ---
 
@@ -9,81 +9,76 @@ output: html_document
 knitr::opts_chunk$set(echo = TRUE, message = FALSE)
 ```
 
+## Introduction
+
+The purpose of this .Rmd is for me to enjoy exploring data about penguins and also to demonstrate some R methods. 
 ```{r}
 library(tidyverse)
 library(scatterPlotMatrix)
+library(palmerpenguins)
 ```
 
+Get data from penguins library.
+```{r}
+data("penguins")
+```
+
+Take a peek at the data.
+```{r}
+str(penguins)
+```
+Hmmm... we might not want year to be an integer. It might be better as a factor, but for now we'll leave it that way.   
+
+\   
+
+Take a different peak at the data.
+```{r}
+summary(penguins)
+```
+
+From the above two outputs, we can see that sex has 11 NAs and two factor levels. The measurement columns each have 2 NA values. I'd like to drop the rows with measurement NAs but not with sex NAs. I'll first change the sex NAs to a new factor level "unknown". Then I'll be able to use drop.na to drop the measurement NAs.
 
 ```{r}
-pen_size <- read.csv("/Users/wendyphillips/Documents/Computing/R_work/data/penguins_size.csv")
+# First change sex back to a non-factor
+penguins$sex <- as.character(penguins$sex)
+
+# Change the sex NAs to unknown
+penguins$sex[is.na(penguins$sex)] <- "unknown"
+
+# Change sex back tor a factor
+penguins$sex <- factor(penguins$sex)
 ```
 
+Check if that did what I wanted.
 ```{r}
-str(pen_size)
+table(penguins$sex)
 ```
 
-
+It did. Now I can use drop_na to get rid of the measurement NA rows.
 ```{r}
-summary(pen_size)
+penguins <- drop_na(penguins)
 ```
 
-
+Check the data again.
 ```{r}
-print(unique(pen_size$species))
-print(table(pen_size$species))
+summary(penguins)
 ```
-
+For a very quick peek at relationships between numeric features, we can use the base R graphics functions pairs.
 ```{r}
-print(unique(pen_size$island))
-print(table(pen_size$island))
+pairs(select_if(penguins, is.numeric))
 ```
-
-
+For a much more sophisticated visualization of the relationship between features, we can use scatterPlotMarix. Here is a plot with mostly default paramaters.
 ```{r}
-table(pen_size$sex)
+scatterPlotMatrix(penguins, zAxisDim = "species", distribType = 1)
 ```
 
-
+The column labels are difficult to see because they overlap so much. I'll change the "_" characters to a break to make the names fit better.
 ```{r}
- pen_size[grep("\\.", pen_size$sex),]
+columnLabels <- gsub("_", "<br>", colnames(penguins))
+scatterPlotMatrix(penguins, zAxisDim = "species", distribType = 1, columnLabels = columnLabels)
 ```
 
-```{r}
- pen_size$sex[grep("\\.", pen_size$sex)] <- "unknown"
-```
-
-Determine how many NA values there are for sex
-```{r}
-sum(is.na(pen_size$sex))
-```
-
-Change these to unknown
-```{r}
- pen_size$sex[is.na(pen_size$sex)] <- "unknown"
-```
-
-
-```{r}
-table(pen_size$sex)
-```
-
-```{r}
-pen_size <- drop_na(pen_size)
-```
-
-```{r}
-pairs(select_if(pen_size, is.numeric))
-```
-
-
-```{r}
-pen_size$species <- factor(pen_size$species)
-columnLabels <- gsub("_", "<br>", colnames(pen_size))
-scatterPlotMatrix(pen_size, zAxisDim = "species", distribType = 1, columnLabels = columnLabels)
-```
-
-Record versions being used
+Record versions being used.
 ```{r}
 sessionInfo()
 ```
